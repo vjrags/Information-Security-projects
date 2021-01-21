@@ -1,0 +1,36 @@
+1. Generate your own collision with this tool. How long did it take?
+	0.456s
+	
+
+2. What are your files?
+
+file1:
+e4f15d5aa32ad16c37b3546c0b0d1bb9494bcfd75513ea4a2d0679f69626
+86cf6d01cd0d4e8d4beceb2f5839c9e35c3e6777b2e28ef29eb07c82619f
+24558216843964ce2947cf4c4140025ca24304a84578b157749c3209abc3
+00e08a5f68c8cf5be803a707e23df93e083bcdd7e986c598db2110c07364
+d33f32d985dbffdc
+
+file2:
+e4f15d5aa32ad16c37b3546c0b0d1bb9494bcf575513ea4a2d0679f69626
+86cf6d01cd0d4e8d4beceb2f5839c9635d3e6777b2e28ef29eb07c82611f
+24558216843964ce2947cf4c4140025ca24304a84578b1d7749c3209abc3
+00e08a5f68c8cf5be803a707e23df93e083bcd57e986c598db2110c07364
+d33f325985dbffdc
+
+
+3. What are their MD5 hashes? Verify that they’re the same.
+
+
+They are the same for both files
+MD5(file1)= 982957b4e450c911658a3639f208301c
+MD5(file2)= 982957b4e450c911658a3639f208301c
+
+
+
+4. What are their SHA-256 hashes? Verify that they’re different.
+
+
+The hashes are different for both files.
+SHA256(file1)= 30ec2496a21fd4ffe004c1e74d718528068056c5cecbfd451c32f9a624398ec5
+SHA256(file2)= f42e03093e035abd4db6b224986594a55c4b1c68d80fde2b33f74a0cb9947cdc

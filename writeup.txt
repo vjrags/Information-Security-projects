@@ -1,0 +1,20 @@
+5.1 
+
+Because length extension attacks rely on a fixed-length unknown value, a fixed 8-digit password allows for easy length extension attacks based
+on the message being sent. Using an HMAC instead of just the hash, the hashing is done more than once and uses a secret key derived from hashing to
+give better security. Because it is hashing more than once, using a length extension attack is very unlikely and would be more like brute force.
+
+5.2 
+
+
+In part 2.2, we saw and implemented a hash collision attack. Hash collision attacks allowed us to execute two different programs with the
+same digital signature, which had two widely different results in execution. This is a huge problem to the integrity of a system because files
+can be modified and execute to take action that can be detrimental to a system without any warning. Threats can be checked with their digital signature
+and if they match the expected signature of a trusted program, then that is very dangerous to a system, as it is a breach in security.
+
+5.3
+
+a) A timing side-channel could be used to determine the type of error occurs, hence allowing the attacker to continue to use their syatem as a padding oracle.
+
+b) No, it will not stop the padding oracle attack. Because, Padding oracle attacks do not depend on the fault in the padding scheme. 
+Padding adds the extra few bits which are necessary for encryption.
